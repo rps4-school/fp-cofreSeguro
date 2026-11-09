@@ -14,7 +14,7 @@ from credenciais import (
     revelar_senha,
 )
 from usuarios import cadastrar_usuario, entrar
-
+from gerador_senha import gerar_senha
 
 def mostrar_menu_inicial():
     print("\n=== Cofre de Senhas ===")
@@ -32,6 +32,7 @@ def mostrar_menu_principal():
     print("5 - Excluir credencial")
     print("6 - Cadastrar categoria")
     print("7 - Consultar categorias")
+    print("8 - Criar senha aleatória")
     print("0 - Sair da conta")
 
 
@@ -69,6 +70,9 @@ def menu_principal(email, hash_master):
             cadastrar_categoria(categorias)
         elif opcao == "7":
             consultar_categorias(categorias)
+        elif opcao == "8":
+            senha = gerar_senha()
+            print(senha)
         else:
             print("Opção inválida.")
 
