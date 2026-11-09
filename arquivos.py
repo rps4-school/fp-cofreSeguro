@@ -1,6 +1,8 @@
 import json
 from datetime import datetime
 
+from cifra import criptografar, descriptografar, gerar_chave
+
 ARQUIVO_SENHAS_COMUNS = "senhas_comuns.txt"
 ARQUIVO_USUARIOS = "usuarios.txt"
 ARQUIVO_LOG = "cofre.log"
@@ -46,11 +48,23 @@ def nome_arquivo_credenciais(email):
 def carregar_credenciais(email):
     try:
         with open(nome_arquivo_credenciais(email), encoding="utf-8") as arquivo:
-            return json.load(arquivo)
+            credenciais = json.load(arquivo)
     except FileNotFoundError:
         return []
+    chave = gerar_chave(email)
+    for credencial in credenciais:
+        if credencial.pop("senha_cifrada", False):
+            credencial["senha"] = descriptografar(credencial["senha"], chave)
+    return credenciais
 
 
 def salvar_credenciais(email, credenciais):
+    chave = gerar_chave(email)
+    para_gravar = []
+    for credencial in credenciais:
+        copia = dict(credencial)
+        copia["senha"] = criptografar(copia["senha"], chave)
+        copia["senha_cifrada"] = True
+        para_gravar.append(copia)
     with open(nome_arquivo_credenciais(email), "w", encoding="utf-8") as arquivo:
-        json.dump(credenciais, arquivo, ensure_ascii=False, indent=2)
+        json.dump(para_gravar, arquivo, ensure_ascii=False, indent=2)

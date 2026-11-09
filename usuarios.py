@@ -23,6 +23,9 @@ def cadastrar_usuario(usuarios):
             f"{TAMANHO_MINIMO_SENHA_MASTER} caracteres."
         )
         return
+    if any(caractere.isspace() for caractere in senha):
+        print("A senha master não pode conter espaços.")
+        return
     usuarios[email] = gerar_hash(senha)
     salvar_usuario(email, usuarios[email])
     registrar_log("INFO", f"Usuário cadastrado: {email}")

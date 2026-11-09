@@ -1,6 +1,8 @@
 import hashlib
 from getpass import getpass
 
+from gerador_senha import gerar_senha
+
 SIMBOLOS = "!@#$%&*()-_=+[]{};:,.?/"
 NIVEIS = {1: "fraca", 2: "média", 3: "forte"}
 
@@ -65,12 +67,28 @@ def mostrar_avaliacao(nivel, motivos):
         print("- atende todos os critérios de uma senha forte")
 
 
+def gerar_senha_valida(minimo, senhas_comuns):
+    while True:
+        senha = gerar_senha()
+        nivel, motivos = avaliar_senha(senha, senhas_comuns)
+        if nivel >= minimo:
+            print(f"Senha gerada: {senha}")
+            mostrar_avaliacao(nivel, motivos)
+            return senha
+
+
 def pedir_senha_valida(categoria, categorias, senhas_comuns):
     minimo = categorias[categoria]
     while True:
+        escolha = input("Gerar senha automaticamente? (s/n): ").strip().lower()
+        if escolha == "s":
+            return gerar_senha_valida(minimo, senhas_comuns)
         senha = getpass("Senha: ")
         if senha == "":
             print("A senha não pode ficar vazia.")
+            continue
+        if any(caractere.isspace() for caractere in senha):
+            print("A senha não pode conter espaços.")
             continue
         nivel, motivos = avaliar_senha(senha, senhas_comuns)
         mostrar_avaliacao(nivel, motivos)

@@ -15,19 +15,22 @@ def consultar_categorias(categorias):
         print(f"- {nome} (senha no mínimo {NIVEIS[minimo]})")
 
 
-def cadastrar_categoria(categorias):
-    nome = input("Nome da categoria: ").strip().lower()
+def cadastrar_categoria(categorias, nome=None):
+    """Cadastra uma categoria e devolve o nome dela (ou None se falhar)."""
+    if nome is None:
+        nome = input("Nome da categoria: ").strip().lower()
     if nome == "":
         print("O nome não pode ficar vazio.")
-        return
+        return None
     print("Exigência mínima de senha: 1 - fraca, 2 - média, 3 - forte")
     opcao = input("Escolha (1, 2 ou 3): ").strip()
     if opcao not in ("1", "2", "3"):
         print("Opção inválida. Categoria não cadastrada.")
-        return
+        return None
     categorias[nome] = int(opcao)
     registrar_log("INFO", f"Categoria cadastrada: {nome}")
     print(f"Categoria '{nome}' salva com exigência mínima {NIVEIS[int(opcao)]}.")
+    return nome
 
 
 def escolher_categoria(categorias):
@@ -35,7 +38,13 @@ def escolher_categoria(categorias):
     nome = input("Categoria da credencial: ").strip().lower()
     if nome in categorias:
         return nome
-    print("Categoria não encontrada. Usando 'outros'.")
+    if nome != "":
+        criar = input(
+            f"A categoria '{nome}' não existe. Cadastrar agora? (s/n): "
+        ).strip().lower()
+        if criar == "s" and cadastrar_categoria(categorias, nome) is not None:
+            return nome
+    print("Usando a categoria 'outros'.")
     return "outros"
 
 
@@ -121,6 +130,39 @@ def editar_credencial(credenciais, categorias, senhas_comuns):
     credencial["alterada_em"] = data_de_agora()
     registrar_log("INFO", f"Credencial editada: {credencial['servico']}")
     print("Credencial atualizada.")
+
+
+def verificar_senhas_repetidas(credenciais, hash_master):
+    if not credenciais:
+        print("Nenhuma credencial cadastrada.")
+        return
+    # agrupa os serviços pela senha usada
+    grupos = {}
+    for credencial in credenciais:
+        senha = credencial["senha"]
+        if senha not in grupos:
+            grupos[senha] = []
+        grupos[senha].append(credencial["servico"])
+
+    encontrou_risco = False
+    for senha, servicos in grupos.items():
+        if len(servicos) > 1:
+            encontrou_risco = True
+            print(f"\nALERTA: a mesma senha é usada em {len(servicos)} serviços:")
+            for servico in servicos:
+                print(f"- {servico}")
+            print("Se um desses serviços vazar, todos os outros ficam expostos.")
+        if gerar_hash(senha) == hash_master:
+            encontrou_risco = True
+            print("\nALERTA: a senha master do cofre também é usada em:")
+            for servico in servicos:
+                print(f"- {servico}")
+            print("Quem descobrir essa senha ganha acesso ao cofre inteiro.")
+
+    if encontrou_risco:
+        registrar_log("AVISO", "Senhas repetidas detectadas na verificação")
+    else:
+        print("Nenhuma senha repetida encontrada. Tudo certo!")
 
 
 def excluir_credencial(credenciais):
