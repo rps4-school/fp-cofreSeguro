@@ -14,12 +14,13 @@ def exportar_log_csv():
 
     total = 0
     with open(ARQUIVO_CSV, "w", encoding="utf-8-sig") as csv:
-        csv.write("data;nivel;mensagem\n")
+        csv.write("data;nivel;usuario;operacao;alvo\n")
         for linha in linhas:
-            partes = linha.strip().split(" | ", 2)
-            if len(partes) == 3:
-                mensagem = partes[2].replace(";", ",").replace('"', "'")
-                csv.write(f"{partes[0]};{partes[1]};{mensagem}\n")
+            partes = [p.replace(";", ",") for p in linha.strip().split(" | ")]
+            if len(partes) == 3:  # formato antigo, sem usuário nem alvo
+                partes = [partes[0], partes[1], "-", partes[2], "-"]
+            if len(partes) == 5:
+                csv.write(";".join(partes) + "\n")
                 total += 1
 
     print(f"{total} registros exportados para {ARQUIVO_CSV}")

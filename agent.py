@@ -147,10 +147,10 @@ def perguntar_ao_agente(credenciais, senhas_comuns):
     try:
         resposta = ask_agent(dados, pergunta)
     except (ValueError, RuntimeError) as erro:
-        registrar_log("AVISO", f"Consulta ao agente de IA falhou: {erro}")
+        registrar_log("AVISO", "consulta ao agente de IA falhou")
         print(erro)
         return
 
-    registrar_log("INFO", "Consulta ao agente de IA realizada")
+    registrar_log("INFO", "consulta ao agente de IA")
     print("\n=== Assistente de IA ===")
     print(resposta)

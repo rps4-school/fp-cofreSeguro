@@ -1,6 +1,6 @@
 from getpass import getpass
 
-from arquivos import registrar_log, salvar_usuario
+from arquivos import definir_usuario_do_log, registrar_log, salvar_usuario
 from senhas import gerar_hash
 
 TAMANHO_MINIMO_SENHA_MASTER = 16
@@ -28,7 +28,7 @@ def cadastrar_usuario(usuarios):
         return
     usuarios[email] = gerar_hash(senha)
     salvar_usuario(email, usuarios[email])
-    registrar_log("INFO", f"Usuário cadastrado: {email}")
+    registrar_log("INFO", "cadastro de usuário", email)
     print("Usuário cadastrado. Agora escolha 'Entrar'.")
 
 
@@ -36,9 +36,10 @@ def entrar(usuarios):
     email = input("E-mail: ").strip().lower()
     senha = getpass("Senha master: ")
     if email in usuarios and usuarios[email] == gerar_hash(senha):
-        registrar_log("INFO", f"Login realizado: {email}")
+        definir_usuario_do_log(email)
+        registrar_log("INFO", "login realizado")
         print(f"Bem-vindo(a), {email}!")
         return email
-    registrar_log("AVISO", f"Tentativa de login recusada: {email}")
+    registrar_log("AVISO", "tentativa de login recusada", email)
     print("E-mail ou senha master incorretos.")
     return None

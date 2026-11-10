@@ -28,7 +28,7 @@ def cadastrar_categoria(categorias, nome=None):
         print("Opção inválida. Categoria não cadastrada.")
         return None
     categorias[nome] = int(opcao)
-    registrar_log("INFO", f"Categoria cadastrada: {nome}")
+    registrar_log("INFO", "cadastro de categoria", nome)
     print(f"Categoria '{nome}' salva com exigência mínima {NIVEIS[int(opcao)]}.")
     return nome
 
@@ -76,7 +76,7 @@ def adicionar_credencial(credenciais, categorias, senhas_comuns):
             "alterada_em": data_de_agora(),
         }
     )
-    registrar_log("INFO", f"Credencial adicionada: {servico}")
+    registrar_log("INFO", "adicionar credencial", servico)
     print("Credencial salva.")
 
 
@@ -100,11 +100,11 @@ def revelar_senha(credenciais, hash_master):
     senha_master = getpass("Confirme a senha master: ")
     if gerar_hash(senha_master) != hash_master:
         registrar_log(
-            "AVISO", f"Revelação recusada (senha master errada): {credencial['servico']}"
+            "AVISO", "revelação recusada (senha master errada)", credencial["servico"]
         )
         print("Senha master incorreta.")
         return
-    registrar_log("INFO", f"Senha revelada: {credencial['servico']}")
+    registrar_log("INFO", "revelar senha", credencial["servico"])
     print(f"Senha de {credencial['servico']}: {credencial['senha']}")
 
 
@@ -128,7 +128,7 @@ def editar_credencial(credenciais, categorias, senhas_comuns):
             credencial["categoria"], categorias, senhas_comuns
         )
     credencial["alterada_em"] = data_de_agora()
-    registrar_log("INFO", f"Credencial editada: {credencial['servico']}")
+    registrar_log("INFO", "editar credencial", credencial["servico"])
     print("Credencial atualizada.")
 
 
@@ -160,7 +160,7 @@ def verificar_senhas_repetidas(credenciais, hash_master):
             print("Quem descobrir essa senha ganha acesso ao cofre inteiro.")
 
     if encontrou_risco:
-        registrar_log("AVISO", "Senhas repetidas detectadas na verificação")
+        registrar_log("AVISO", "verificar senhas repetidas", "risco detectado")
     else:
         print("Nenhuma senha repetida encontrada. Tudo certo!")
 
@@ -172,7 +172,7 @@ def excluir_credencial(credenciais):
     confirmacao = input(f"Digite SIM para excluir '{credencial['servico']}': ")
     if confirmacao.strip().upper() == "SIM":
         credenciais.remove(credencial)
-        registrar_log("INFO", f"Credencial excluída: {credencial['servico']}")
+        registrar_log("INFO", "excluir credencial", credencial["servico"])
         print("Credencial excluída.")
     else:
         print("Exclusão cancelada.")

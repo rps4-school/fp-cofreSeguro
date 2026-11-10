@@ -2,8 +2,11 @@ from arquivos import (
     carregar_credenciais,
     carregar_senhas_comuns,
     carregar_usuarios,
+    definir_usuario_do_log,
     salvar_credenciais,
 )
+from auditoria import consultar_auditoria_sistema, consultar_auditoria_usuario
+from csv_cofre import exportar_log_csv
 from credenciais import (
     adicionar_credencial,
     cadastrar_categoria,
@@ -20,11 +23,6 @@ from agent import perguntar_ao_agente
 
 
 def executar_menu(titulo, opcoes, texto_sair, mensagem_saida):
-    """Mostra o menu descrito em 'opcoes' e executa a ação escolhida.
-
-    'opcoes' é um dicionário: {"1": ("Descrição", funcao), ...}
-    A opção "0" sempre encerra o menu.
-    """
     while True:
         print(f"\n=== {titulo} ===")
         for numero, (descricao, _) in opcoes.items():
@@ -76,6 +74,9 @@ def menu_principal(email, hash_master):
         "8": ("Criar senha aleatória", lambda: print(gerar_senha())),
         "9": ("Verificar senhas repetidas", lambda: verificar_senhas_repetidas(credenciais, hash_master),),
         "10": ("Perguntar ao assistente de IA", lambda: perguntar_ao_agente(credenciais, senhas_comuns),),
+        "11": ("Meu histórico (auditoria)", lambda: consultar_auditoria_usuario(email)),
+        "12": ("Auditoria do sistema", consultar_auditoria_sistema),
+        "13": ("Exportar auditoria para CSV", exportar_log_csv),
     }
     executar_menu("Menu do Cofre", opcoes, "Sair da conta", "Saindo da conta.")
 
@@ -84,6 +85,7 @@ def fazer_login(usuarios):
     email = entrar(usuarios)
     if email is not None:
         menu_principal(email, usuarios[email])
+        definir_usuario_do_log(None)  # saiu da conta
 
 
 def main():

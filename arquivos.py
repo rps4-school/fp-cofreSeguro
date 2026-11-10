@@ -8,10 +8,22 @@ ARQUIVO_USUARIOS = "usuarios.txt"
 ARQUIVO_LOG = "cofre.log"
 
 
-def registrar_log(nivel, mensagem):
+# guarda quem está logado para o log registrar o autor de cada operação,
+# sem precisar passar o e-mail para todas as funções
+USUARIO_DO_LOG = {"email": "-"}
+
+
+def definir_usuario_do_log(email):
+    USUARIO_DO_LOG["email"] = email if email else "-"
+
+
+def registrar_log(nivel, operacao, alvo="-"):
+    """Registra: data e hora | nível | usuário | operação | alvo afetado."""
     data = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
     with open(ARQUIVO_LOG, "a", encoding="utf-8") as arquivo:
-        arquivo.write(f"{data} | {nivel} | {mensagem}\n")
+        arquivo.write(
+            f"{data} | {nivel} | {USUARIO_DO_LOG['email']} | {operacao} | {alvo}\n"
+        )
 
 
 def carregar_senhas_comuns():
