@@ -23,7 +23,8 @@ O projeto é dividido em 7 partes sendo elas:
 - Funcionalidade Extra
 
 # Documentações
-[Definições do projeto](DOCS/descricao_projeto.md)
+- [Definições do projeto](DOCS/definicoes_projeto.md)
+- [Busca de credencial por trecho (funcionalidade extra)](DOCS/busca_por_trecho.md)
 
 
 # Grupo:

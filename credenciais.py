@@ -57,6 +57,26 @@ def encontrar_credencial(credenciais):
     return None
 
 
+def buscar_por_trecho(credenciais, trecho):
+    encontradas = []
+    for credencial in credenciais:
+        if trecho.lower() in credencial["servico"].lower():
+            encontradas.append(credencial)
+    return encontradas
+
+
+def buscar_credenciais(credenciais):
+    trecho = input("Trecho do nome do serviço: ").strip()
+    if trecho == "":
+        print("O trecho não pode ficar vazio.")
+        return
+    encontradas = buscar_por_trecho(credenciais, trecho)
+    if not encontradas:
+        print("Nenhuma credencial encontrada.")
+        return
+    listar_credenciais(encontradas)
+
+
 def adicionar_credencial(credenciais, categorias, senhas_comuns):
     servico = input("Nome do serviço: ").strip()
     if servico == "":
