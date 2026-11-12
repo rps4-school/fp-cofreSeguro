@@ -6,6 +6,9 @@ logger = logging.getLogger(__name__)
 GROQ_MODEL = "openai/gpt-oss-120b"
 CHARACTER_LIMIT = 20000
 TAMANHO_MAXIMO_PERGUNTA_NO_LOG = 200
+MARCA_DE_OCULTO = "[oculto]"
+TAMANHO_MINIMO_PARA_BUSCA_PARCIAL = 6
+PONTUACAO_DAS_BORDAS = ".,;:!?()[]{}\"'"
 
 PROMPT_TEMPLATE = """Você é um assistente inteligente do sistema CofreSeguro.
 
@@ -142,6 +145,33 @@ def montar_dados_para_agente(credenciais, senhas_comuns):
     return "\n".join(linhas)
 
 
+def ocultar_senhas(texto, credenciais, hash_master=None):
+    from senhas import gerar_hash
+
+    senhas_do_cofre = [credencial["senha"] for credencial in credenciais]
+    palavras = []
+    ocultadas = 0
+    for palavra in texto.split():
+        miolo = palavra.strip(PONTUACAO_DAS_BORDAS)
+        ocultar = False
+        for senha in senhas_do_cofre:
+            if len(senha) >= TAMANHO_MINIMO_PARA_BUSCA_PARCIAL and senha in palavra:
+                ocultar = True
+        for candidata in (palavra, miolo):
+            if candidata == "":
+                continue
+            if candidata in senhas_do_cofre:
+                ocultar = True
+            if hash_master is not None and gerar_hash(candidata) == hash_master:
+                ocultar = True
+        if ocultar:
+            palavras.append(MARCA_DE_OCULTO)
+            ocultadas = ocultadas + 1
+        else:
+            palavras.append(palavra)
+    return " ".join(palavras), ocultadas
+
+
 def pergunta_para_log(pergunta):
     """Deixa a pergunta em uma linha só e sem o separador do log."""
     texto = " ".join(pergunta.split()).replace("|", "/")
@@ -150,7 +180,7 @@ def pergunta_para_log(pergunta):
     return texto
 
 
-def perguntar_ao_agente(credenciais, senhas_comuns):
+def perguntar_ao_agente(credenciais, senhas_comuns, hash_master=None):
     from arquivos import registrar_log
 
     print("\nPergunte sobre o funcionamento do CofreSeguro ou sobre suas")
@@ -162,6 +192,11 @@ def perguntar_ao_agente(credenciais, senhas_comuns):
     if pergunta == "":
         print("A pergunta não pode ficar vazia.")
         return
+    pergunta, ocultadas = ocultar_senhas(pergunta, credenciais, hash_master)
+    if ocultadas > 0:
+        print(f"\nAtenção: {ocultadas} senha(s) do cofre foram ocultadas da pergunta.")
+        print("Elas não serão enviadas nem registradas.")
+        print(f"Pergunta que será usada: {pergunta}")
     alvo = pergunta_para_log(pergunta)
 
     confirmacao = input(

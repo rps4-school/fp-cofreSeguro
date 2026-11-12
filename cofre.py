@@ -74,7 +74,7 @@ def menu_principal(email, hash_master):
         "7": ("Consultar categorias", lambda: consultar_categorias(categorias)),
         "8": ("Criar senha aleatória", lambda: print(gerar_senha())),
         "9": ("Verificar senhas repetidas", lambda: verificar_senhas_repetidas(credenciais, hash_master),),
-        "10": ("Perguntar ao assistente de IA", lambda: perguntar_ao_agente(credenciais, senhas_comuns),),
+        "10": ("Perguntar ao assistente de IA", lambda: perguntar_ao_agente(credenciais, senhas_comuns, hash_master),),
         "11": ("Meu histórico (auditoria)", lambda: consultar_auditoria_usuario(email)),
         "12": ("Auditoria do sistema", consultar_auditoria_sistema),
         "13": ("Exportar auditoria para CSV", exportar_log_csv),
