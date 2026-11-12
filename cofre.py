@@ -16,6 +16,7 @@ from credenciais import (
     listar_credenciais,
     revelar_senha,
     verificar_senhas_repetidas,
+    buscar_credenciais,
 )
 from usuarios import cadastrar_usuario, entrar
 from gerador_senha import gerar_senha
@@ -77,6 +78,7 @@ def menu_principal(email, hash_master):
         "11": ("Meu histórico (auditoria)", lambda: consultar_auditoria_usuario(email)),
         "12": ("Auditoria do sistema", consultar_auditoria_sistema),
         "13": ("Exportar auditoria para CSV", exportar_log_csv),
+        "14": ("Buscar credencial por trecho", lambda: buscar_credenciais(credenciais)),
     }
     executar_menu("Menu do Cofre", opcoes, "Sair da conta", "Saindo da conta.")
 
