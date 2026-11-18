@@ -19,7 +19,7 @@ from credenciais import (
     buscar_credenciais,
 )
 from usuarios import cadastrar_usuario, entrar
-from gerador_senha import gerar_senha
+from senhas import gerar_senha_valida
 from agent import perguntar_ao_agente
 
 
@@ -72,7 +72,7 @@ def menu_principal(email, hash_master):
         "5": ("Excluir credencial", excluir),
         "6": ("Cadastrar categoria", lambda: cadastrar_categoria(categorias)),
         "7": ("Consultar categorias", lambda: consultar_categorias(categorias)),
-        "8": ("Criar senha aleatória", lambda: print(gerar_senha())),
+        "8": ("Criar senha aleatória", lambda: gerar_senha_valida(3, senhas_comuns)),
         "9": ("Verificar senhas repetidas", lambda: verificar_senhas_repetidas(credenciais, hash_master),),
         "10": ("Perguntar ao assistente de IA", lambda: perguntar_ao_agente(credenciais, senhas_comuns, hash_master),),
         "11": ("Meu histórico (auditoria)", lambda: consultar_auditoria_usuario(email)),

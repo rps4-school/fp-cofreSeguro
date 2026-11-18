@@ -1,5 +1,6 @@
 from datetime import datetime
 
+from gerador_senha import SIMBOLOS, gerar_senha
 from agent import montar_dados_para_agente, ocultar_senhas
 from cifra import criptografar, descriptografar, gerar_chave
 from credenciais import buscar_por_trecho
@@ -86,6 +87,21 @@ def teste_esconder_senha_muito_curta():
     mascara = esconder_senha(senha)
 
     assert mascara == "********"
+
+
+# ==================
+# GERADOR DE SENHA
+# ==================
+
+def teste_gerador_usa_simbolos_que_o_avaliador_conhece():
+    senhas_geradas = []
+    for _ in range(100):
+        senhas_geradas.append(gerar_senha())
+
+    for senha in senhas_geradas:
+        for caractere in senha:
+            if not caractere.isalnum():
+                assert caractere in SIMBOLOS
 
 
 # ===================
@@ -220,6 +236,7 @@ def rodar_testes():
         teste_senha_comum_sempre_fraca,
         teste_esconder_senha_tamanho_fixo,
         teste_esconder_senha_muito_curta,
+        teste_gerador_usa_simbolos_que_o_avaliador_conhece,
         teste_busca_por_trecho,
         teste_busca_sem_resultado,
         teste_cifra_ida_e_volta,
