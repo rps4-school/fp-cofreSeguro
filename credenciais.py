@@ -57,6 +57,13 @@ def encontrar_credencial(credenciais):
     return None
 
 
+def servico_ja_existe(credenciais, servico):
+    for credencial in credenciais:
+        if credencial["servico"].lower() == servico.lower():
+            return True
+    return False
+
+
 def buscar_por_trecho(credenciais, trecho):
     encontradas = []
     for credencial in credenciais:
@@ -82,6 +89,10 @@ def adicionar_credencial(credenciais, categorias, senhas_comuns):
     if servico == "":
         print("O nome do serviço não pode ficar vazio.")
         return
+    if servico_ja_existe(credenciais, servico):
+        print(f"Já existe uma credencial para '{servico}'. Use a opção 4 para editar.")
+        return
+
     usuario = input("Usuário ou e-mail: ").strip()
     categoria = escolher_categoria(categorias)
     senha = pedir_senha_valida(categoria, categorias, senhas_comuns)
@@ -134,6 +145,10 @@ def editar_credencial(credenciais, categorias, senhas_comuns):
         return
     print("Deixe em branco para manter o valor atual.")
     servico = input(f"Novo serviço [{credencial['servico']}]: ").strip()
+    mudou_nome = servico != "" and servico.lower() != credencial["servico"].lower()
+    if mudou_nome and servico_ja_existe(credenciais, servico):
+        print(f"Já existe uma credencial para '{servico}'. Edição cancelada.")
+        return
     usuario = input(f"Novo usuário [{credencial['usuario']}]: ").strip()
     observacoes = input(f"Novas observações [{credencial['observacoes']}]: ").strip()
     if servico != "":
@@ -164,25 +179,28 @@ def verificar_senhas_repetidas(credenciais, hash_master):
             grupos[senha] = []
         grupos[senha].append(credencial["servico"])
 
-    encontrou_risco = False
+    servicos_afetados = []
     for senha, servicos in grupos.items():
         if len(servicos) > 1:
-            encontrou_risco = True
             print(f"\nALERTA: a mesma senha é usada em {len(servicos)} serviços:")
             for servico in servicos:
                 print(f"- {servico}")
+                if servico not in servicos_afetados:
+                    servicos_afetados.append(servico)
             print("Se um desses serviços vazar, todos os outros ficam expostos.")
         if gerar_hash(senha) == hash_master:
-            encontrou_risco = True
             print("\nALERTA: a senha master do cofre também é usada em:")
             for servico in servicos:
                 print(f"- {servico}")
+                if servico not in servicos_afetados:
+                    servicos_afetados.append(servico)
             print("Quem descobrir essa senha ganha acesso ao cofre inteiro.")
 
-    if encontrou_risco:
-        registrar_log("AVISO", "verificar senhas repetidas", "risco detectado")
+    if servicos_afetados:
+        registrar_log("AVISO", "verificar senhas repetidas", ", ".join(servicos_afetados))
     else:
         print("Nenhuma senha repetida encontrada. Tudo certo!")
+
 
 
 def excluir_credencial(credenciais):
