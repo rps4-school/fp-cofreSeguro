@@ -22,14 +22,14 @@ Trecho do nome do serviço: mail
 
 1) Email Escola
    Usuário: aluna.ficticia
-   Senha: Se*************
+   Senha: Se********
    Categoria: estudo
    Observações:
    Última alteração: 01/01/2026 10:00
 
 2) Mail Trabalho
    Usuário: pessoa.exemplo
-   Senha: Ou*************
+   Senha: Ou********
    Categoria: trabalho
    Observações:
    Última alteração: 01/01/2026 10:00

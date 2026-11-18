@@ -5,6 +5,8 @@ from gerador_senha import gerar_senha
 
 SIMBOLOS = "!@#$%&*()-_=+[]{};:,.?/"
 NIVEIS = {1: "fraca", 2: "média", 3: "forte"}
+QUANTIDADE_ASTERISCOS = 8
+TAMANHO_MINIMO_PARA_MOSTRAR = 5
 
 
 def gerar_hash(senha):
@@ -12,7 +14,9 @@ def gerar_hash(senha):
 
 
 def esconder_senha(senha):
-    return senha[:2] + "*" * (len(senha) - 2)
+    if len(senha) < TAMANHO_MINIMO_PARA_MOSTRAR:
+        return "*" * QUANTIDADE_ASTERISCOS
+    return senha[:2] + "*" * QUANTIDADE_ASTERISCOS
 
 
 def avaliar_senha(senha, senhas_comuns):
