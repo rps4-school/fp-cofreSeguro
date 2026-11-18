@@ -22,6 +22,35 @@ O projeto é dividido em 7 partes sendo elas:
 - Relatório de Segurança
 - Funcionalidade Extra
 
+## Como rodar
+
+Requisito: Python 3 instalado.
+
+Todos os comandos abaixo devem ser executados **dentro da pasta do projeto** (`fp-cofreSeguro`), pois o programa lê e grava os arquivos de dados nessa pasta.
+
+1. Crie o ambiente virtual (só na primeira vez):
+   ```
+   python -m venv .venv
+   ```
+2. Ative o ambiente virtual (toda vez que abrir um terminal novo):
+   ```
+   .venv\Scripts\Activate.ps1
+   ```
+   Se o PowerShell bloquear a execução de scripts, rode uma vez `Set-ExecutionPolicy -Scope CurrentUser RemoteSigned` e tente de novo.
+3. Instale as dependências (só na primeira vez):
+   ```
+   pip install -r requirements.txt
+   ```
+4. Configure a chave do assistente de IA (opcional, só para a opção "Perguntar ao assistente de IA"):
+   - copie o arquivo `.env.example` e renomeie a cópia para `.env`;
+   - crie uma chave em https://console.groq.com/keys e coloque no lugar de `sua_chave_aqui`.
+
+   O arquivo `.env` não vai para o GitHub. Nunca compartilhe sua chave.
+5. Execute o programa:
+   ```
+   python cofre.py
+   ```
+
 # Documentações
 - [Definições do projeto](DOCS/definicoes_projeto.md)
 - [Busca de credencial por trecho (funcionalidade extra)](DOCS/busca_por_trecho.md)
