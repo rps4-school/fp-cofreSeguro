@@ -2,7 +2,7 @@ from datetime import datetime
 from getpass import getpass
 
 from arquivos import registrar_log
-from senhas import NIVEIS, esconder_senha, gerar_hash, pedir_senha_valida
+from senhas import NIVEIS, avaliar_senha, esconder_senha, gerar_hash, pedir_senha_valida
 
 
 def data_de_agora():
@@ -142,7 +142,21 @@ def editar_credencial(credenciais, categorias, senhas_comuns):
         credencial["usuario"] = usuario
     if observacoes != "":
         credencial["observacoes"] = observacoes
+    trocar_categoria = input(
+        f"Trocar a categoria [{credencial['categoria']}]? (s/n): "
+    ).strip().lower()
+    if trocar_categoria == "s":
+        credencial["categoria"] = escolher_categoria(categorias)
     trocar = input("Trocar a senha? (s/n): ").strip().lower()
+    if trocar != "s" and trocar_categoria == "s":
+        nivel, _ = avaliar_senha(credencial["senha"], senhas_comuns)
+        minimo = categorias.get(credencial["categoria"], 1)
+        if nivel < minimo:
+            print(
+                f"A categoria '{credencial['categoria']}' exige senha no mínimo "
+                f"{NIVEIS[minimo]}. Escolha uma nova senha."
+            )
+            trocar = "s"
     if trocar == "s":
         credencial["senha"] = pedir_senha_valida(
             credencial["categoria"], categorias, senhas_comuns

@@ -1,8 +1,10 @@
 from arquivos import (
+    carregar_categorias,
     carregar_credenciais,
     carregar_senhas_comuns,
     carregar_usuarios,
     definir_usuario_do_log,
+    salvar_categorias,
     salvar_credenciais,
 )
 from auditoria import consultar_auditoria_sistema, consultar_auditoria_usuario
@@ -43,26 +45,26 @@ def executar_menu(titulo, opcoes, texto_sair, mensagem_saida):
 
 def menu_principal(email, hash_master):
     credenciais = carregar_credenciais(email)
-    categorias = {
-        "banco": 3,
-        "rede social": 2,
-        "estudo": 1,
-        "trabalho": 2,
-        "outros": 1,
-    }
+    categorias = carregar_categorias(email)
     senhas_comuns = carregar_senhas_comuns()
 
     def adicionar():
         adicionar_credencial(credenciais, categorias, senhas_comuns)
         salvar_credenciais(email, credenciais)
+        salvar_categorias(email, categorias)
 
     def editar():
         editar_credencial(credenciais, categorias, senhas_comuns)
         salvar_credenciais(email, credenciais)
+        salvar_categorias(email, categorias)
 
     def excluir():
         excluir_credencial(credenciais)
         salvar_credenciais(email, credenciais)
+
+    def nova_categoria():
+        cadastrar_categoria(categorias)
+        salvar_categorias(email, categorias)
 
     opcoes = {
         "1": ("Adicionar credencial", adicionar),
@@ -70,7 +72,7 @@ def menu_principal(email, hash_master):
         "3": ("Revelar senha", lambda: revelar_senha(credenciais, hash_master)),
         "4": ("Editar credencial", editar),
         "5": ("Excluir credencial", excluir),
-        "6": ("Cadastrar categoria", lambda: cadastrar_categoria(categorias)),
+        "6": ("Cadastrar categoria", nova_categoria),
         "7": ("Consultar categorias", lambda: consultar_categorias(categorias)),
         "8": ("Criar senha aleatória", lambda: gerar_senha_valida(3, senhas_comuns)),
         "9": ("Verificar senhas repetidas", lambda: verificar_senhas_repetidas(credenciais, hash_master),),

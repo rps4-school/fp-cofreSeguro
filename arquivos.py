@@ -7,6 +7,14 @@ ARQUIVO_SENHAS_COMUNS = "senhas_comuns.txt"
 ARQUIVO_USUARIOS = "usuarios.txt"
 ARQUIVO_LOG = "cofre.log"
 
+CATEGORIAS_PADRAO = {
+    "banco": 3,
+    "rede social": 2,
+    "estudo": 1,
+    "trabalho": 2,
+    "outros": 1,
+}
+
 
 # guarda quem está logado para o log registrar o autor de cada operação,
 # sem precisar passar o e-mail para todas as funções
@@ -51,6 +59,33 @@ def carregar_usuarios():
 def salvar_usuario(email, hash_senha):
     with open(ARQUIVO_USUARIOS, "a", encoding="utf-8") as arquivo:
         arquivo.write(f"{email};{hash_senha}\n")
+
+
+def nome_arquivo_categorias(email):
+    return f"categorias_{email}.txt"
+
+
+def carregar_categorias(email):
+    categorias = dict(CATEGORIAS_PADRAO)
+    try:
+        with open(nome_arquivo_categorias(email), encoding="utf-8") as arquivo:
+            for linha in arquivo:
+                try:
+                    nome, nivel = linha.strip().rsplit(";", 1)
+                    nivel = int(nivel)
+                except ValueError:
+                    continue
+                if nome != "" and nivel in (1, 2, 3):
+                    categorias[nome] = nivel
+    except FileNotFoundError:
+        pass
+    return categorias
+
+
+def salvar_categorias(email, categorias):
+    with open(nome_arquivo_categorias(email), "w", encoding="utf-8") as arquivo:
+        for nome, nivel in categorias.items():
+            arquivo.write(f"{nome};{nivel}\n")
 
 
 def nome_arquivo_credenciais(email):
