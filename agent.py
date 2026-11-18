@@ -59,7 +59,12 @@ def ask_agent(content, question):
         raise ValueError("A pergunta excede o limite de envio para o agente.")
 
     try:
-        from groq import Groq
+        from groq import (
+            APIConnectionError,
+            AuthenticationError,
+            Groq,
+            RateLimitError,
+        )
     except ImportError:
         raise RuntimeError(
             "A biblioteca groq não está instalada. Instale com: pip install groq"
@@ -79,12 +84,22 @@ def ask_agent(content, question):
             temperature=0.3,
             max_completion_tokens=1024,
         )
+    except AuthenticationError:
+        logger.warning("Consulta ao agente de IA falhou: chave inválida.", extra={"status_code": 401})
+        raise RuntimeError("Chave da API inválida. Confira a GROQ_API_KEY no arquivo .env.") from None
+    except RateLimitError:
+        logger.warning("Consulta ao agente de IA falhou: limite de uso.", extra={"status_code": 429})
+        raise RuntimeError("Limite de uso da API atingido. Espere alguns minutos e tente de novo.") from None
+    except APIConnectionError:
+        logger.warning("Consulta ao agente de IA falhou: sem conexão.", extra={"status_code": 503})
+        raise RuntimeError("Sem conexão com o serviço de IA. Verifique sua internet.") from None
     except Exception:
         logger.warning("Consulta ao agente de IA falhou.", extra={"status_code": 502})
         raise RuntimeError("Não foi possível consultar o agente de IA.") from None
 
     logger.info("Consulta ao agente de IA concluída.", extra={"status_code": 200})
     resposta = completion.choices[0].message.content
+
     if not resposta:
         raise RuntimeError("O agente de IA não devolveu uma resposta.")
     return resposta
