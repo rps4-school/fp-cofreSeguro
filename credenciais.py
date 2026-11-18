@@ -162,7 +162,7 @@ def editar_credencial(credenciais, categorias, senhas_comuns):
         credencial["senha"] = pedir_senha_valida(
             credencial["categoria"], categorias, senhas_comuns
         )
-    credencial["alterada_em"] = data_de_agora()
+        credencial["alterada_em"] = data_de_agora()
     registrar_log("INFO", "editar credencial", credencial["servico"])
     print("Credencial atualizada.")
 
