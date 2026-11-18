@@ -10,7 +10,7 @@ from arquivos import (
     salvar_categorias,
 )
 from cifra import criptografar, descriptografar, gerar_chave
-from credenciais import buscar_por_trecho
+from credenciais import buscar_por_trecho, servico_ja_existe
 from resumo_seguranca import dias_sem_alterar
 from senhas import avaliar_senha, esconder_senha, gerar_hash
 
@@ -136,6 +136,13 @@ def teste_busca_sem_resultado():
     encontradas = buscar_por_trecho(credenciais, "xyz")
 
     assert encontradas == []
+
+
+def teste_servico_ja_existe():
+    credenciais = [criar_credencial("Google", "x")]
+
+    assert servico_ja_existe(credenciais, "google")
+    assert not servico_ja_existe(credenciais, "Banco")
 
 
 # ========
@@ -289,6 +296,7 @@ def rodar_testes():
         teste_gerador_usa_simbolos_que_o_avaliador_conhece,
         teste_busca_por_trecho,
         teste_busca_sem_resultado,
+        teste_servico_ja_existe,
         teste_cifra_ida_e_volta,
         teste_cifra_com_sal,
         teste_dias_sem_alterar,

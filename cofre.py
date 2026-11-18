@@ -23,6 +23,7 @@ from credenciais import (
 from usuarios import cadastrar_usuario, entrar
 from senhas import gerar_senha_valida
 from agent import perguntar_ao_agente
+from resumo_seguranca import mostrar_resumo
 
 
 def executar_menu(titulo, opcoes, texto_sair, mensagem_saida):
@@ -81,6 +82,8 @@ def menu_principal(email, hash_master):
         "12": ("Auditoria do sistema", consultar_auditoria_sistema),
         "13": ("Exportar auditoria para CSV", exportar_log_csv),
         "14": ("Buscar credencial por trecho", lambda: buscar_credenciais(credenciais)),
+        "15": ("Relatório de segurança", lambda: mostrar_resumo(credenciais, senhas_comuns)),
+
     }
     executar_menu("Menu do Cofre", opcoes, "Sair da conta", "Saindo da conta.")
 
