@@ -1,7 +1,14 @@
+import os
 from datetime import datetime
 
 from gerador_senha import SIMBOLOS, gerar_senha
 from agent import montar_dados_para_agente, ocultar_senhas
+from arquivos import (
+    CATEGORIAS_PADRAO,
+    carregar_categorias,
+    nome_arquivo_categorias,
+    salvar_categorias,
+)
 from cifra import criptografar, descriptografar, gerar_chave
 from credenciais import buscar_por_trecho, servico_ja_existe
 from resumo_seguranca import dias_sem_alterar
@@ -231,6 +238,49 @@ def teste_ocultar_senha_master():
     assert ocultadas == 1
 
 
+EMAIL_TESTE = "teste.categorias@ficticio.com"
+
+
+def apagar_arquivo_categorias():
+    if os.path.exists(nome_arquivo_categorias(EMAIL_TESTE)):
+        os.remove(nome_arquivo_categorias(EMAIL_TESTE))
+
+
+def teste_categorias_sem_arquivo():
+    apagar_arquivo_categorias()
+
+    categorias = carregar_categorias(EMAIL_TESTE)
+
+    assert categorias == CATEGORIAS_PADRAO
+
+
+def teste_salvar_e_carregar_categorias():
+    categorias = carregar_categorias(EMAIL_TESTE)
+    categorias["jogos"] = 1
+
+    salvar_categorias(EMAIL_TESTE, categorias)
+    carregadas = carregar_categorias(EMAIL_TESTE)
+    apagar_arquivo_categorias()
+
+    assert carregadas == categorias
+    assert carregadas["jogos"] == 1
+
+
+def teste_categorias_linha_errada():
+    with open(nome_arquivo_categorias(EMAIL_TESTE), "w", encoding="utf-8") as arquivo:
+        arquivo.write("jogos;1\n")
+        arquivo.write("linha sem separador\n")
+        arquivo.write("musica;abc\n")
+        arquivo.write("filmes;7\n")
+
+    categorias = carregar_categorias(EMAIL_TESTE)
+    apagar_arquivo_categorias()
+
+    assert categorias["jogos"] == 1
+    assert "musica" not in categorias
+    assert "filmes" not in categorias
+
+
 # ==========
 # EXECUÇÃO
 # ==========
@@ -253,6 +303,9 @@ def rodar_testes():
         teste_agente_nao_recebe_senhas_nem_usuarios,
         teste_ocultar_senhas_na_pergunta,
         teste_ocultar_senha_master,
+        teste_categorias_sem_arquivo,
+        teste_salvar_e_carregar_categorias,
+        teste_categorias_linha_errada,
     ]
     passou = 0
     falhou = 0

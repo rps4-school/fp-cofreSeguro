@@ -81,7 +81,7 @@ def gerar_senha_valida(minimo, senhas_comuns):
 
 
 def pedir_senha_valida(categoria, categorias, senhas_comuns):
-    minimo = categorias[categoria]
+    minimo = categorias.get(categoria, 1)
     while True:
         escolha = input("Gerar senha automaticamente? (s/n): ").strip().lower()
         if escolha == "s":
