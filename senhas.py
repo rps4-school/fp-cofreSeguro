@@ -1,9 +1,8 @@
 import hashlib
 from getpass import getpass
 
-from gerador_senha import gerar_senha
+from gerador_senha import SIMBOLOS, gerar_senha
 
-SIMBOLOS = "!@#$%&*()-_=+[]{};:,.?/"
 NIVEIS = {1: "fraca", 2: "média", 3: "forte"}
 QUANTIDADE_ASTERISCOS = 8
 TAMANHO_MINIMO_PARA_MOSTRAR = 5
