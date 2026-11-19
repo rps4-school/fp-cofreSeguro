@@ -10,6 +10,7 @@ from arquivos import (
     nome_arquivo_categorias,
     nome_arquivo_credenciais,
     salvar_categorias,
+    salvar_credenciais,
 )
 from cifra import criptografar, descriptografar, gerar_chave
 from credenciais import buscar_por_trecho, servico_ja_existe
@@ -283,7 +284,16 @@ def teste_categorias_linha_errada():
     assert "filmes" not in categorias
 
 
+# ===========================
+# ARQUIVO DE CREDENCIAIS
+# ===========================
+
 EMAIL_TESTE_CREDENCIAIS = "teste.credenciais@ficticio.com"
+
+
+def apagar_arquivo_credenciais():
+    if os.path.exists(nome_arquivo_credenciais(EMAIL_TESTE_CREDENCIAIS)):
+        os.remove(nome_arquivo_credenciais(EMAIL_TESTE_CREDENCIAIS))
 
 
 def escrever_arquivo_credenciais(conteudo):
@@ -296,9 +306,37 @@ def ler_arquivo_credenciais():
         return arquivo.read()
 
 
-def apagar_arquivo_credenciais():
-    if os.path.exists(nome_arquivo_credenciais(EMAIL_TESTE_CREDENCIAIS)):
-        os.remove(nome_arquivo_credenciais(EMAIL_TESTE_CREDENCIAIS))
+def teste_credenciais_sem_arquivo():
+    apagar_arquivo_credenciais()
+
+    credenciais = carregar_credenciais(EMAIL_TESTE_CREDENCIAIS)
+
+    assert credenciais == []
+
+
+def teste_salvar_e_carregar_credenciais():
+    credenciais = [
+        criar_credencial("Google", "Gato@2024"),
+        criar_credencial("Banco", "OutraSenha$99"),
+    ]
+
+    salvar_credenciais(EMAIL_TESTE_CREDENCIAIS, credenciais)
+    carregadas = carregar_credenciais(EMAIL_TESTE_CREDENCIAIS)
+    apagar_arquivo_credenciais()
+
+    assert carregadas == credenciais
+
+
+def teste_senha_cifrada_no_arquivo():
+    credenciais = [criar_credencial("Google", "Gato@2024")]
+
+    salvar_credenciais(EMAIL_TESTE_CREDENCIAIS, credenciais)
+    with open(nome_arquivo_credenciais(EMAIL_TESTE_CREDENCIAIS), encoding="utf-8") as arquivo:
+        conteudo = arquivo.read()
+    apagar_arquivo_credenciais()
+
+    assert "Google" in conteudo
+    assert "Gato@2024" not in conteudo
 
 
 def teste_credenciais_arquivo_corrompido():
@@ -349,6 +387,9 @@ def rodar_testes():
         teste_categorias_sem_arquivo,
         teste_salvar_e_carregar_categorias,
         teste_categorias_linha_errada,
+        teste_credenciais_sem_arquivo,
+        teste_salvar_e_carregar_credenciais,
+        teste_senha_cifrada_no_arquivo,
         teste_credenciais_arquivo_corrompido,
         teste_credencial_sem_campo,
     ]
