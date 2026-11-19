@@ -296,6 +296,16 @@ def apagar_arquivo_credenciais():
         os.remove(nome_arquivo_credenciais(EMAIL_TESTE_CREDENCIAIS))
 
 
+def escrever_arquivo_credenciais(conteudo):
+    with open(nome_arquivo_credenciais(EMAIL_TESTE_CREDENCIAIS), "w", encoding="utf-8") as arquivo:
+        arquivo.write(conteudo)
+
+
+def ler_arquivo_credenciais():
+    with open(nome_arquivo_credenciais(EMAIL_TESTE_CREDENCIAIS), encoding="utf-8") as arquivo:
+        return arquivo.read()
+
+
 def teste_credenciais_sem_arquivo():
     apagar_arquivo_credenciais()
 
@@ -329,6 +339,29 @@ def teste_senha_cifrada_no_arquivo():
     assert "Gato@2024" not in conteudo
 
 
+def teste_credenciais_arquivo_corrompido():
+    conteudo = "isso não é um arquivo de credenciais"
+    escrever_arquivo_credenciais(conteudo)
+
+    credenciais = carregar_credenciais(EMAIL_TESTE_CREDENCIAIS)
+    conteudo_depois = ler_arquivo_credenciais()
+    apagar_arquivo_credenciais()
+
+    assert credenciais is None
+    assert conteudo_depois == conteudo
+
+
+def teste_credencial_sem_campo():
+    escrever_arquivo_credenciais('[{"servico": "Google", "senha": "Gato@2024"}]')
+
+    credenciais = carregar_credenciais(EMAIL_TESTE_CREDENCIAIS)
+    apagar_arquivo_credenciais()
+
+    assert credenciais[0]["servico"] == "Google"
+    assert credenciais[0]["observacoes"] == ""
+    assert credenciais[0]["categoria"] == ""
+
+
 # ==========
 # EXECUÇÃO
 # ==========
@@ -357,6 +390,8 @@ def rodar_testes():
         teste_credenciais_sem_arquivo,
         teste_salvar_e_carregar_credenciais,
         teste_senha_cifrada_no_arquivo,
+        teste_credenciais_arquivo_corrompido,
+        teste_credencial_sem_campo,
     ]
     passou = 0
     falhou = 0
