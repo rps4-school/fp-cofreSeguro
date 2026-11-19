@@ -117,7 +117,7 @@ Tudo o que você adiciona, edita ou exclui é salvo automaticamente.
 Toda senha cadastrada passa por uma avaliação que dá **1 ponto** para cada critério cumprido:
 
 | Critério | Ponto |
-|---|---|
+|--- | ---|
 | Tem pelo menos 8 caracteres | +1 |
 | Tem pelo menos 12 caracteres | +1 |
 | Mistura letras minúsculas e maiúsculas | +1 |
