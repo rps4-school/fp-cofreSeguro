@@ -117,7 +117,7 @@ Tudo o que você adiciona, edita ou exclui é salvo automaticamente.
 Toda senha cadastrada passa por uma avaliação que dá **1 ponto** para cada critério cumprido:
 
 | Critério | Ponto |
-|--- | ---|
+|---|---|
 | Tem pelo menos 8 caracteres | +1 |
 | Tem pelo menos 12 caracteres | +1 |
 | Mistura letras minúsculas e maiúsculas | +1 |
@@ -158,17 +158,22 @@ A explicação completa do relatório de segurança está em [Resumo de seguran�
   - O log de auditoria também fica em arquivo comum, então pode ser apagado ou alterado por quem tiver acesso ao computador.
   - O assistente de IA envia as perguntas para um serviço externo (Groq). Para reduzir o risco, as senhas nunca são enviadas: só metadados, e senhas digitadas na pergunta viram `[oculto]`.
 
+### Por que as credenciais ficam em JSON e não em .csv ou .txt?
+
+O enunciado sugere `.csv` ou `.txt`, mas o grupo escolheu **JSON** para as credenciais porque cada credencial tem vários campos (serviço, usuário, senha cifrada, categoria, observações e data). Em JSON, a lista de credenciais é salva e carregada do mesmo jeito que ela fica no programa, sem precisar separar campos manualmente. Em CSV, uma vírgula digitada nas observações, por exemplo, quebraria a separação das colunas. O log de auditoria continua podendo ser exportado em `.csv` (opção 13).
+
 ## Bibliotecas usadas
 
 - **Externa:** `groq` (assistente de IA), instalada pelo `requirements.txt`.
 - **Biblioteca padrão do Python:** `json`, `hashlib`, `secrets`, `base64`, `getpass`, `datetime`, `os`, `string` e `logging`.
+
+O enunciado permite apenas `os` e `datetime`. As demais bibliotecas listadas acima foram **autorizadas pelos professores**.
 
 ## Documentações
 
 * [Definições do projeto](https://github.com/rps4-school/fp-cofreSeguro/blob/main/DOCS/definicoes_projeto.md)
 * [Busca de credencial por trecho (funcionalidade extra)](https://github.com/rps4-school/fp-cofreSeguro/blob/main/DOCS/busca_por_trecho.md)
 * [Resumo de segurança](https://github.com/rps4-school/fp-cofreSeguro/blob/main/DOCS/resumo_seguranca.md)
-* [Manual do usuário](https://github.com/rps4-school/fp-cofreSeguro/blob/main/DOCS/manual_usuario.md)
 
 ## Grupo
 
