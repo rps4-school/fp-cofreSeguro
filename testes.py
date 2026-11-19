@@ -6,7 +6,9 @@ from agent import montar_dados_para_agente, ocultar_senhas
 from arquivos import (
     CATEGORIAS_PADRAO,
     carregar_categorias,
+    carregar_credenciais,
     nome_arquivo_categorias,
+    nome_arquivo_credenciais,
     salvar_categorias,
 )
 from cifra import criptografar, descriptografar, gerar_chave
@@ -281,6 +283,47 @@ def teste_categorias_linha_errada():
     assert "filmes" not in categorias
 
 
+EMAIL_TESTE_CREDENCIAIS = "teste.credenciais@ficticio.com"
+
+
+def escrever_arquivo_credenciais(conteudo):
+    with open(nome_arquivo_credenciais(EMAIL_TESTE_CREDENCIAIS), "w", encoding="utf-8") as arquivo:
+        arquivo.write(conteudo)
+
+
+def ler_arquivo_credenciais():
+    with open(nome_arquivo_credenciais(EMAIL_TESTE_CREDENCIAIS), encoding="utf-8") as arquivo:
+        return arquivo.read()
+
+
+def apagar_arquivo_credenciais():
+    if os.path.exists(nome_arquivo_credenciais(EMAIL_TESTE_CREDENCIAIS)):
+        os.remove(nome_arquivo_credenciais(EMAIL_TESTE_CREDENCIAIS))
+
+
+def teste_credenciais_arquivo_corrompido():
+    conteudo = "isso não é um arquivo de credenciais"
+    escrever_arquivo_credenciais(conteudo)
+
+    credenciais = carregar_credenciais(EMAIL_TESTE_CREDENCIAIS)
+    conteudo_depois = ler_arquivo_credenciais()
+    apagar_arquivo_credenciais()
+
+    assert credenciais is None
+    assert conteudo_depois == conteudo
+
+
+def teste_credencial_sem_campo():
+    escrever_arquivo_credenciais('[{"servico": "Google", "senha": "Gato@2024"}]')
+
+    credenciais = carregar_credenciais(EMAIL_TESTE_CREDENCIAIS)
+    apagar_arquivo_credenciais()
+
+    assert credenciais[0]["servico"] == "Google"
+    assert credenciais[0]["observacoes"] == ""
+    assert credenciais[0]["categoria"] == ""
+
+
 # ==========
 # EXECUÇÃO
 # ==========
@@ -306,6 +349,8 @@ def rodar_testes():
         teste_categorias_sem_arquivo,
         teste_salvar_e_carregar_categorias,
         teste_categorias_linha_errada,
+        teste_credenciais_arquivo_corrompido,
+        teste_credencial_sem_campo,
     ]
     passou = 0
     falhou = 0

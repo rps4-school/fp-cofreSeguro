@@ -46,6 +46,8 @@ def executar_menu(titulo, opcoes, texto_sair, mensagem_saida):
 
 def menu_principal(email, hash_master):
     credenciais = carregar_credenciais(email)
+    if credenciais is None:
+        return
     categorias = carregar_categorias(email)
     senhas_comuns = carregar_senhas_comuns()
 
@@ -96,12 +98,15 @@ def fazer_login(usuarios):
 
 
 def main():
-    usuarios = carregar_usuarios()
-    opcoes = {
-        "1": ("Entrar", lambda: fazer_login(usuarios)),
-        "2": ("Cadastrar usuário", lambda: cadastrar_usuario(usuarios)),
-    }
-    executar_menu("Cofre de Senhas", opcoes, "Sair", "Até logo!")
+    try:
+        usuarios = carregar_usuarios()
+        opcoes = {
+            "1": ("Entrar", lambda: fazer_login(usuarios)),
+            "2": ("Cadastrar usuário", lambda: cadastrar_usuario(usuarios)),
+        }
+        executar_menu("Cofre de Senhas", opcoes, "Sair", "Até logo!")
+    except (KeyboardInterrupt, EOFError):
+        print("\nPrograma encerrado.")
 
 
 if __name__ == "__main__":

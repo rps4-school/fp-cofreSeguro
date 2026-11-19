@@ -26,8 +26,10 @@ def cadastrar_usuario(usuarios):
     if any(caractere.isspace() for caractere in senha):
         print("A senha master não pode conter espaços.")
         return
-    usuarios[email] = gerar_hash(senha)
-    salvar_usuario(email, usuarios[email])
+    hash_senha = gerar_hash(senha)
+    if not salvar_usuario(email, hash_senha):
+        return
+    usuarios[email] = hash_senha
     registrar_log("INFO", "cadastro de usuário", email)
     print("Usuário cadastrado. Agora escolha 'Entrar'.")
 
