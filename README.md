@@ -15,7 +15,7 @@ credenciais, entender a força de cada senha, e enxergar os riscos que hoje ele 
 ## Estrutura do projeto
 O projeto é dividido em 7 partes sendo elas:
 - CRUD de Credenciais
-- Análise de força bruta
+- Análise de força de senha
 - Detecção de Risco
 - Registro de auditoria
 - Armazenamento de Dados
@@ -54,6 +54,7 @@ Todos os comandos abaixo devem ser executados **dentro da pasta do projeto** (`f
 # Documentações
 - [Definições do projeto](DOCS/definicoes_projeto.md)
 - [Busca de credencial por trecho (funcionalidade extra)](DOCS/busca_por_trecho.md)
+- [Resumo de segurança](DOCS/resumo_seguranca.md)
 
 
 # Grupo:

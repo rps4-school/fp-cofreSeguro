@@ -220,3 +220,7 @@ __marimo__/
 .streamlit/secrets.toml
 credenciais_*
 categorias_*
+
+# Limpeza de arquivos de log e dados sensíveis
+usuarios.txt
+log_auditoria.csv
