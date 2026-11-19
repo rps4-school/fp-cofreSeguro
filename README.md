@@ -38,7 +38,7 @@ python -m venv .venv
 .venv\Scripts\Activate.ps1
 ```
 
-Se o PowerShell bloquear a execução de scripts, rode uma vez `Set-ExecutionPolicy -Scope CurrentUser RemoteSigned` e tente de novo.
+Se o PowerShell bloquear a execução de scripts, rode uma vez `Set-ExecutionPolicy -Scope CurrentUser RemoteSigned` e tente de novo. Se estiver usando o **cmd** em vez do PowerShell, o comando é `.venv\Scripts\activate.bat`.
 
 3. Instale as dependências (só na primeira vez):
 
@@ -68,6 +68,8 @@ python cofre.py
 | 2 - Cadastrar usuário | Cria uma conta nova (e-mail + senha master). |
 | 0 - Sair | Fecha o programa. |
 
+A **senha master** precisa ter **no mínimo 16 caracteres** e **não pode ter espaços**. Ela protege o cofre inteiro, por isso a exigência é maior que a das outras senhas.
+
 ### Menu do Cofre (depois de entrar)
 
 **Credenciais**
@@ -75,7 +77,7 @@ python cofre.py
 | Opção | O que faz |
 |---|---|
 | 1 - Adicionar credencial | Pede o nome do serviço, o usuário/e-mail, a categoria, a senha e observações. Não deixa cadastrar dois serviços com o mesmo nome. A senha pode ser digitada ou gerada automaticamente e precisa atingir o nível mínimo da categoria. |
-| 2 - Listar credenciais | Mostra todas as credenciais com a senha escondida (só os 2 primeiros caracteres aparecem), a categoria e a data da última alteração. |
+| 2 - Listar credenciais | Mostra todas as credenciais com a senha escondida, a categoria e a data da última alteração. A senha aparece como os 2 primeiros caracteres seguidos de **sempre 8 asteriscos** (ex.: `Ab********`). Senhas com menos de 5 caracteres ficam totalmente escondidas. O número fixo de asteriscos serve para não revelar o tamanho da senha. |
 | 3 - Revelar senha | Pede o nome do serviço e **confirma a senha master** antes de mostrar a senha. Se a senha master estiver errada, a tentativa fica registrada na auditoria. |
 | 4 - Editar credencial | Altera serviço, usuário, observações, categoria e senha. Deixe o campo em branco para manter o valor atual. Se a nova categoria exigir uma senha mais forte, o programa obriga a trocar a senha. |
 | 5 - Excluir credencial | Pede o nome do serviço e só exclui se você digitar **SIM**. |
@@ -85,7 +87,7 @@ python cofre.py
 
 | Opção | O que faz |
 |---|---|
-| 6 - Cadastrar categoria | Cria uma categoria nova (ex.: "redes sociais", "estudos"). |
+| 6 - Cadastrar categoria | Cria uma categoria nova (ex.: "jogos", "streaming"). |
 | 7 - Consultar categorias | Lista as categorias cadastradas e a força mínima de senha de cada uma. |
 
 Ao criar uma categoria, você escolhe a força mínima de senha exigida (fraca, média ou forte). Se você digitar uma categoria que não existe ao adicionar uma credencial, o programa oferece cadastrá-la na hora. Se você recusar, a credencial vai para a categoria "outros".
@@ -96,7 +98,7 @@ Ao criar uma categoria, você escolhe a força mínima de senha exigida (fraca, 
 |---|---|
 | 8 - Criar senha aleatória | Gera uma senha forte que não está na lista de senhas comuns. |
 | 9 - Verificar senhas repetidas | Avisa se a mesma senha é usada em mais de um serviço **e se a senha master do cofre também é usada em algum serviço**. |
-| 10 - Perguntar ao assistente de IA | Tira dúvidas sobre as suas senhas e sobre segurança (precisa da chave configurada no `.env`). |
+| 10 - Perguntar ao assistente de IA | Tira dúvidas sobre as suas senhas e sobre segurança (precisa da chave configurada no `.env`). O assistente **nunca recebe as senhas**: só são enviados metadados (serviço, categoria, força, se é repetida e a data de alteração), e qualquer senha digitada na pergunta vira `[oculto]` antes de ser enviada. |
 | 15 - Relatório de segurança | Mostra um resumo da situação das suas senhas: quantas são fracas, repetidas ou comuns e há quanto tempo não são alteradas. |
 
 **Auditoria**
@@ -105,7 +107,7 @@ Ao criar uma categoria, você escolhe a força mínima de senha exigida (fraca, 
 |---|---|
 | 11 - Meu histórico | Mostra as ações que você fez no cofre. |
 | 12 - Auditoria do sistema | Mostra o registro geral de ações do sistema. |
-| 13 - Exportar auditoria para CSV | Salva o log de auditoria em um arquivo .csv. |
+| 13 - Exportar auditoria para CSV | Salva o log de auditoria no arquivo `log_auditoria.csv`, que pode ser aberto no Excel. |
 | 0 - Sair da conta | Volta para a tela inicial. |
 
 Tudo o que você adiciona, edita ou exclui é salvo automaticamente.
@@ -149,17 +151,24 @@ A explicação completa do relatório de segurança está em [Resumo de seguran�
 - Este é um projeto **didático**, feito para a disciplina, e **não deve ser usado para guardar senhas reais**.
 - Use **somente dados fictícios** (e-mails e senhas inventados).
 - Por que não serve para uso real:
-  - As senhas das credenciais ficam salvas **em texto puro** no arquivo. Quem abrir o arquivo vê todas as senhas, sem precisar da senha master. Um cofre real criptografaria essas senhas usando a senha master como chave.
+  - As senhas das credenciais são **cifradas** no arquivo, mas a chave da cifra é gerada a partir do **e-mail**. Quem tiver o código e o arquivo consegue decifrar tudo sem a senha master. Um cofre real usaria a senha master para gerar a chave. Além disso, a cifra foi feita pelo grupo, para fins didáticos, e não usa um algoritmo testado e reconhecido.
+  - **Não há limite de tentativas de login**, então alguém pode ficar testando senhas master sem ser bloqueado.
   - A senha master é guardada com SHA-256 **sem "sal"**. Esse é um hash muito rápido, e um atacante com o arquivo consegue testar milhões de senhas por segundo. Sistemas reais usam algoritmos lentos e com sal, como bcrypt ou Argon2.
   - Os dados ficam em **arquivos de texto no computador**, que qualquer pessoa com acesso à máquina pode copiar.
   - O log de auditoria também fica em arquivo comum, então pode ser apagado ou alterado por quem tiver acesso ao computador.
-  - O assistente de IA envia as perguntas para um serviço externo (Groq), fora do computador do usuário.
+  - O assistente de IA envia as perguntas para um serviço externo (Groq). Para reduzir o risco, as senhas nunca são enviadas: só metadados, e senhas digitadas na pergunta viram `[oculto]`.
+
+## Bibliotecas usadas
+
+- **Externa:** `groq` (assistente de IA), instalada pelo `requirements.txt`.
+- **Biblioteca padrão do Python:** `json`, `hashlib`, `secrets`, `base64`, `getpass`, `datetime`, `os`, `string` e `logging`.
 
 ## Documentações
 
 * [Definições do projeto](https://github.com/rps4-school/fp-cofreSeguro/blob/main/DOCS/definicoes_projeto.md)
 * [Busca de credencial por trecho (funcionalidade extra)](https://github.com/rps4-school/fp-cofreSeguro/blob/main/DOCS/busca_por_trecho.md)
 * [Resumo de segurança](https://github.com/rps4-school/fp-cofreSeguro/blob/main/DOCS/resumo_seguranca.md)
+* [Manual do usuário](https://github.com/rps4-school/fp-cofreSeguro/blob/main/DOCS/manual_usuario.md)
 
 ## Grupo
 
